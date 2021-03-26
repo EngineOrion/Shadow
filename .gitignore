@@ -19,10 +19,10 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+.elixir_ls/
 
 # Temporary files for e.g. tests
 /tmp
-
 
 # Shadow specific ignores
 resources/

@@ -16,11 +16,11 @@ openssl rsa -in resources/private.pem -pubout > resources/public.pem
 
 # Verification file
 echo "Creating verification file"
-openssl dgst -sha1 -sign resources/private.pem -out resources/verification.txt resources/base.txt
+openssl dgst -md5 -sign resources/private.pem -out resources/verification.txt resources/base.txt
 
 # Verify verfication process
 echo "Confirming process validation"
-openssl dgst -sha1 -verify resources/public.pem -signature resources/verification.txt resources/base.txt
+openssl dgst -md5 -verify resources/public.pem -signature resources/verification.txt resources/base.txt
 
 # Temporary Shadow.Key
 echo "Generating initial Shadow.Key"
