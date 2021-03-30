@@ -2,6 +2,11 @@
 # Warning: Running this script will overwrite any existing secrets & reset the configuration.
 # Only run this script for a new instance or if you know what you are doing.
 
+echo "Warning: Running this script will delete any local member secrets."
+echo "Only run this script for a fresh instance or if you know what you are doing."
+echo "Do you want to proceed?"
+read var
+
 rm -rf resources/
 mkdir resources/
 

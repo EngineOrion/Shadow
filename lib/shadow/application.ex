@@ -10,7 +10,8 @@ defmodule Shadow.Application do
     children = [
       # Starts a worker by calling: Shadow.Worker.start_link(arg)
       # {Shadow.Worker, arg}
-      {Shadow.Verification.Worker, []}
+      {Shadow.Verification.Worker, []},
+      #Shadow.Listener,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
