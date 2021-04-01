@@ -7,26 +7,26 @@ echo "Only run this script for a fresh instance or if you know what you are doin
 echo "Do you want to proceed?"
 read var
 
-rm -rf resources/
-mkdir resources/
+rm -rf .shadow/
+mkdir .shadow/
 
 # Base file
-echo "Creating default base.txt file"
-echo "Shadow Messaging Engine" >> resources/base.txt
+echo "Creating default base.shadow file"
+echo "Time is an illusion. Lunchtime doubly so." >> .shadow/base.shadow
 
 # Key generation
 echo "Generating new keypair"
-openssl genrsa -out resources/private.pem 512
-openssl rsa -in resources/private.pem -pubout > resources/public.pem
+openssl genrsa -out .shadow/private.shadow 512
+openssl rsa -in .shadow/private.shadow -pubout > .shadow/public.shadow
 
 # Verification file
 echo "Creating verification file"
-openssl dgst -md5 -sign resources/private.pem -out resources/verification.txt resources/base.txt
+openssl dgst -md5 -sign .shadow/private.shadow -out .shadow/verification.shadow .shadow/base.shadow
 
 # Verify verfication process
 echo "Confirming process validation"
-openssl dgst -md5 -verify resources/public.pem -signature resources/verification.txt resources/base.txt
+openssl dgst -md5 -verify .shadow/public.shadow -signature .shadow/verification.shadow .shadow/base.shadow
 
 # Temporary Shadow.Key
 echo "Generating initial Shadow.Key"
-openssl dgst -md5 resources/private.pem | awk '{print $2}' >> resources/key.txt
+openssl dgst -md5 .shadow/private.shadow | awk '{print $2}' >> .shadow/key.shadow
