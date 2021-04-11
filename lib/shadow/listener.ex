@@ -1,39 +1,33 @@
 defmodule Shadow.Listener do
   @moduledoc """
-  This module is responsible for listening to incoming TCP connections.
-  Current sample implemenation: https://elixir-lang.org/getting-started/mix-otp/task-and-gen-tcp.html
+  A simple TCP server.
   """
+
+  use GenServer
+
+  alias Shadow.Listener.Handler
+
   require Logger
 
-  def accept(port) do
-    {:ok, socket} =
-      :gen_tcp.listen(port, [:binary, packet: :line, active: false, reuseaddr: true])
-
-    Logger.info("Accepting connections on port #{port}")
-    loop_acceptor(socket)
+  @doc """
+  Starts the server.
+  """
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
-  defp loop_acceptor(socket) do
-    {:ok, client} = :gen_tcp.accept(socket)
-    serve(client)
-    loop_acceptor(socket)
-  end
+  @doc """
+  Initiates the listener (pool of acceptors).
+  """
+  def init(port: port) do
+    opts = [{:port, port}]
 
-  defp serve(socket) do
-    socket
-    |> read_line()
-    |> write_line(socket)
+    {:ok, pid} = :ranch.start_listener(:network, :ranch_tcp, opts, Handler, [])
 
-    serve(socket)
-  end
+    Logger.info(fn ->
+      "Listening for connections on port #{port}"
+    end)
 
-  defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    Logger.info("#{data}")
-    data
-  end
-
-  defp write_line(line, socket) do
-    :gen_tcp.send(socket, line)
+    {:ok, pid}
   end
 end
