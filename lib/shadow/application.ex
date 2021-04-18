@@ -11,7 +11,8 @@ defmodule Shadow.Application do
       # Starts a worker by calling: Shadow.Worker.start_link(arg)
       # {Shadow.Worker, arg}
       {Shadow.Verification.Worker, []},
-      {Shadow.Routing.Table, []}
+      {Shadow.Routing.Table, []},
+      {Shadow.DynamicHandler, []},
       # Shadow.Listener,
     ]
 

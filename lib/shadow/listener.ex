@@ -1,33 +1,26 @@
 defmodule Shadow.Listener do
   @moduledoc """
-  A simple TCP server.
+  (http://www.robgolding.com/blog/2019/05/21/tcp-genserver-elixir/)
   """
 
-  use GenServer
+  alias Shadow.DynamicHandler, as: Supervisor
 
-  alias Shadow.Listener.Handler
-
-  require Logger
-
-  @doc """
-  Starts the server.
-  """
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+  def start_link(port) do
+    Task.start_link(__MODULE__, :accept, [port])
   end
 
-  @doc """
-  Initiates the listener (pool of acceptors).
-  """
-  def init(port: port) do
-    opts = [{:port, port}]
+  def accept(port) do
+    {:ok, listen_socket} = :gen_tcp.listen(
+      port,
+      [:binary, packet: :line, active: :true, reuseaddr: true]
+    )
+    loop_acceptor(listen_socket)
+  end
 
-    {:ok, pid} = :ranch.start_listener(:network, :ranch_tcp, opts, Handler, [])
-
-    Logger.info(fn ->
-      "Listening for connections on port #{port}"
-    end)
-
-    {:ok, pid}
+  defp loop_acceptor(listen_socket) do
+    {:ok, socket} = :gen_tcp.accept(listen_socket)
+    {:ok, pid} = Supervisor.start_child(socket)
+    :gen_tcp.controlling_process(socket, pid)
+    loop_acceptor(listen_socket)
   end
 end
