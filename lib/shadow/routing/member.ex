@@ -42,6 +42,7 @@ defmodule Shadow.Routing.Member do
   end
 
   def init({:in, %__MODULE__{} = params}) do
+    IO.inspect params
     {:ok, params}
   end
 
@@ -58,6 +59,7 @@ defmodule Shadow.Routing.Member do
 
   # TCP Callbacks
   def handle_info({:tcp, _socket, data}, state) do
+    IO.puts data
     message = Message.process(data)
     case message.type do
       2 -> {:noreply, activate(message, state)}
@@ -69,7 +71,6 @@ defmodule Shadow.Routing.Member do
   end
 
   # '{\"body\":{\"ip\":\"localhost\",\"key\":1234,\"port\":4242,\"public\":\"qwertzuiopü\"},\"timestamp\":6666,\"type\":2}'
-
   def activate(message, state) do
     # Activate in router
     routing = Routing.activate(state.key, message)

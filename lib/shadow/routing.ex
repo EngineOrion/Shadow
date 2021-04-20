@@ -25,10 +25,9 @@ defmodule Shadow.Routing do
   end
 
   @doc """
-  Creates a non active process, with state for both the new process state & updated routing table.
-  
-  Temporary Key: Passed to the Member Process until it is active.
-
+  Creates a non active process, with state for both the new process
+  state & updated routing table. Temporary Key: Passed to the Member
+  Process until it is active.
   """
   def new(socket) do
     GenServer.call(:routing, {:new, socket})
@@ -54,16 +53,19 @@ defmodule Shadow.Routing do
 
   def handle_call({:activate, key, message}, _from, state) do
     member = Map.get(state, key)
-    updated = %__MODULE__{
-      key: message.key,
-      ref: member.ref,
-      timestamp: member.timestamp,
-      active: true
-    }
-    # Remove old (temp) key
-    cleared = Map.pop(state, key)
-    new = Map.put(cleared, message.key, updated)
-    {:reply, updated, new}
+    if not member.active do
+      updated = %__MODULE__{
+	key: message.key,
+	ref: member.ref,
+	timestamp: member.timestamp,
+	active: true
+      }
+      cleared = Map.pop(state, key) |> elem(0)
+      new = Map.put(cleared, message.key, updated)
+      {:reply, updated, new}
+    else
+      {:reply, member, state}
+    end
   end
 
   def handle_info({:DOWN, ref, _, _, _}, state) do
@@ -75,5 +77,4 @@ defmodule Shadow.Routing do
   def get_key(state, ref) do
     Enum.find(state, fn {_k, v} -> v.ref == ref end) |> elem(1)
   end
-  
 end
