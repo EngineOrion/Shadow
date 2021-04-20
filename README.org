@@ -1,4 +1,6 @@
-#+TITLE: Shadow
+#+TITLE: Orion: Shadow
 #+AUTHOR: Jakob Klemm
 
-Routing & Transport for the Orion Engine.
+Distributed routing & messaging protocol for the =Engine: Orion= system.
+* Messaging
+Example of messages in =documentation= repository.

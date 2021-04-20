@@ -19,13 +19,9 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
-.elixir_ls/
+# Ignore package tarball (built via "mix hex.build").
+shadow-*.tar
+
 
 # Temporary files for e.g. tests
 /tmp
-
-# Shadow specific ignores
-.shadow/
-
-# Temporary rust helper stuff
-helper/server/target
