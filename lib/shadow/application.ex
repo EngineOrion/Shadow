@@ -25,14 +25,9 @@ defmodule Shadow.Application do
   defp listener() do
     %{
         id: Shadow.Listener,
-        start: {Shadow.Listener, :start_link, [port()]},
+        start: {Shadow.Listener, :start_link, [Shadow.Intern.Helpers.port()]},
         type: :worker,
         restart: :permanent,
       }
-  end
-
-  # Can fail if config error!
-  defp port() do
-    Application.fetch_env!(:shadow, :port)
   end
 end

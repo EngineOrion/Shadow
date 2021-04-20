@@ -10,7 +10,7 @@ defmodule Shadow.Intern.Supervisor do
   end
 
   def init(_) do
-    DynamicSupervisor.init(strategy: :one_for_one, max_restarts: 5, restart: :transient)
+    DynamicSupervisor.init(strategy: :one_for_one, restart: :temporary, max_restarts: 0)
   end
 
   def start_child(opts) do

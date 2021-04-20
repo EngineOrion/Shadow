@@ -16,9 +16,12 @@ defmodule Shadow.Routing.Member do
 
   """
   @derive Jason.Encoder
-  defstruct [:key, :ip, :port, :score, :public, :timestamp, :ref, :socket, :active]
+  defstruct [:key, :ip, :port, :public, :socket]
 
   use GenServer
+
+  alias Shadow.Routing
+  alias Shadow.Routing.Message
 
   @doc """
   Entry point for starting a new process => Creating a new connection.
@@ -55,15 +58,27 @@ defmodule Shadow.Routing.Member do
 
   # TCP Callbacks
   def handle_info({:tcp, _socket, data}, state) do
-    # TODO: Pass to router
-    #with {:ok, message} <- Jason.decode(String.trim(data)) do
-    IO.inspect data
-    {:noreply, state}
-    #end
+    message = Message.process(data)
+    case message.type do
+      2 -> {:noreply, activate(message, state)}
+    end
   end
 
   def handle_info({:tcp_closed, _socket}, _state) do
-    IO.puts "shutdown"
-    Process.exit(self(), :shutdown)
+    Process.exit(self(), :normal)
+  end
+
+  # '{\"body\":{\"ip\":\"localhost\",\"key\":1234,\"port\":4242,\"public\":\"qwertzuiopü\"},\"timestamp\":6666,\"type\":2}'
+
+  def activate(message, state) do
+    # Activate in router
+    routing = Routing.activate(state.key, message)
+    %__MODULE__{
+      key: routing.key,
+      ip: message.ip,
+      port: message.port,
+      public: message.public,
+      socket: state.socket
+    }
   end
 end
