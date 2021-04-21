@@ -13,6 +13,7 @@ defmodule Shadow.Application do
       {Shadow.Intern.Supervisor, []},
       listener(),
       {Shadow.Routing, []},
+      {Shadow.Intern.Registry, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

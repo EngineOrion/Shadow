@@ -4,9 +4,6 @@ defmodule Shadow.Listener do
   For each new conn a dedicated GenServer is started & ownership is transfered.
   """
 
-  alias Shadow.Intern.Supervisor, as: Supervisor
-  alias Shadow.Routing.Member, as: Member
-
   def start_link(port) do
     Task.start_link(__MODULE__, :accept, [port])
   end
@@ -22,7 +19,7 @@ defmodule Shadow.Listener do
   defp loop_acceptor(listen_socket) do
     {:ok, socket} = :gen_tcp.accept(listen_socket)
     # TODO: Call routing for new processes, not supervisor directly.
-    pid = Shadow.Routing.new(socket)#Supervisor.start_child(opts)
+    pid = Shadow.Routing.new(socket)
     :gen_tcp.controlling_process(socket, pid)
     loop_acceptor(listen_socket)
   end

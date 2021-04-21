@@ -15,4 +15,8 @@ defmodule Shadow.Intern.Helpers do
     Application.fetch_env!(:shadow, :port)
   end
   
+  def id() do
+    time = unix_now() |> Integer.to_string(16)
+    :crypto.hash(:md5, time) |> Base.url_encode64(padding: false)
+  end
 end

@@ -16,7 +16,7 @@ defmodule Shadow.Routing.Member do
 
   """
   @derive Jason.Encoder
-  defstruct [:key, :ip, :port, :public, :socket]
+  defstruct [:id, :key, :ip, :port, :public, :socket]
 
   use GenServer
 
@@ -29,7 +29,7 @@ defmodule Shadow.Routing.Member do
   inits will be called from that.
   """
   def start_link({type, %__MODULE__{} = params}) do
-    GenServer.start_link(__MODULE__, {type, params})
+    GenServer.start_link(__MODULE__, {type, params}, name: name(params.id))
   end
 
   def init({:out, %__MODULE__{} = params}) do
@@ -42,13 +42,16 @@ defmodule Shadow.Routing.Member do
   end
 
   def init({:in, %__MODULE__{} = params}) do
-    IO.inspect params
     {:ok, params}
   end
 
   # GenServer Interface
-  def send(pid, data) do
-    GenServer.cast(pid, {:send, data})
+  def send(id, message) do
+    GenServer.cast(name(id), {:send, message})
+  end
+
+  def export(id) do
+    GenServer.call(name(id), :export)
   end
 
   # GenServer Callbacks
@@ -57,11 +60,15 @@ defmodule Shadow.Routing.Member do
     {:noreply, state}
   end
 
+  def handle_call(:export, _from, state) do
+    {:reply, state, state}
+  end
+
   # TCP Callbacks
   def handle_info({:tcp, _socket, data}, state) do
-    IO.puts data
     message = Message.process(data)
     case message.type do
+      0 -> {:noreply, call(message)}
       2 -> {:noreply, activate(message, state)}
     end
   end
@@ -70,16 +77,28 @@ defmodule Shadow.Routing.Member do
     Process.exit(self(), :normal)
   end
 
+  def call(message) do
+    target = Routing.target(message)
+    :ok = Routing.send(target, message)
+  end
+
   # '{\"body\":{\"ip\":\"localhost\",\"key\":1234,\"port\":4242,\"public\":\"qwertzuiopü\"},\"timestamp\":6666,\"type\":2}'
   def activate(message, state) do
+    IO.puts "Activation"
+    IO.inspect message
     # Activate in router
-    routing = Routing.activate(state.key, message)
+    routing = Routing.activate(state.id, message)
     %__MODULE__{
+      id: routing.id,
       key: routing.key,
       ip: message.ip,
       port: message.port,
       public: message.public,
       socket: state.socket
     }
+  end
+
+  defp name(id) do
+    {:via, Shadow.Intern.Registry, id}
   end
 end
