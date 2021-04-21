@@ -1,0 +1,26 @@
+{
+    "__SERVER__": {
+        "public": "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZ3d0RRWUpLb1pJaHZjTkFRRUJCUUFEU3dBd1NBSkJBS3VNczl6NmhIQ05ub0pxcCtjY2lHeGppb2NuMmpvRwpyNGpVMkdRVHI3ZTJxY0FSZFN6dllScVo4Z1BGOXlOR2wrcDlPYzF6UjFSaUVQUUpyS3dzQmM4Q0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo",
+        "port": 4242,
+        "key": 764374543084974790038930300293630902343216099111,
+        "ip": "8.8.8.8"
+    },
+    "8888": {
+        "public": "qwertzuiopü",
+        "port": 4242,
+        "ip": [
+            49,
+            57,
+            50,
+            46,
+            49,
+            54,
+            56,
+            46,
+            49,
+            46,
+            50,
+            53
+        ]
+    }
+}

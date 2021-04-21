@@ -82,10 +82,7 @@ defmodule Shadow.Routing.Member do
     :ok = Routing.send(target, message)
   end
 
-  # '{\"body\":{\"ip\":\"localhost\",\"key\":1234,\"port\":4242,\"public\":\"qwertzuiopü\"},\"timestamp\":6666,\"type\":2}'
   def activate(message, state) do
-    IO.puts "Activation"
-    IO.inspect message
     # Activate in router
     routing = Routing.activate(state.id, message)
     %__MODULE__{
