@@ -2,9 +2,7 @@
 #+AUTHOR: Jakob Klemm
 
 Distributed routing & messaging protocol for the =Engine: Orion= system.
-* Messaging
-Example of messages in =documentation= repository.
-* Registry
-Currently there is one full implementation of the Registry Spec & one
-custom version using monitor references in the Routing. Those will
-have to be combined in the future.
+* TODOs
+** TODO Unit Testing & Type safety
+** TODO Unix socket communication
+** TODO Test with multiple instances
