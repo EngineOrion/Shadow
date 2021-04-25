@@ -19,7 +19,7 @@ defmodule Shadow.Listener do
   defp loop_acceptor(listen_socket) do
     {:ok, socket} = :gen_tcp.accept(listen_socket)
     # TODO: Call routing for new processes, not supervisor directly.
-    pid = Shadow.Routing.new(socket)
+    pid = Shadow.Routing.incoming(socket)
     :gen_tcp.controlling_process(socket, pid)
     loop_acceptor(listen_socket)
   end

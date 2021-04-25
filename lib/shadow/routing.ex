@@ -29,12 +29,16 @@ defmodule Shadow.Routing do
   state & updated routing table. Temporary Key: Passed to the Member
   Process until it is active.
   """
-  def new(socket) do
-    GenServer.call(:routing, {:new, socket})
+  def incoming(socket) do
+    GenServer.call(:routing, {:in, socket})
   end
 
-  def activate(key, message) do
-    GenServer.call(:routing, {:activate, key, message})
+  def outgoing(ip, port) do
+    GenServer.call(:routing, {:out, {ip, port}})
+  end
+
+  def activate(id, message) do
+    GenServer.call(:routing, {:activate, id, message})
   end
 
   def target(message) do
@@ -53,11 +57,32 @@ defmodule Shadow.Routing do
     GenServer.call(:routing, :export)
   end
 
-  def handle_call({:new, socket}, _from, state) do
+  def switch(id) do
+    GenServer.cast(:routing, {:switch, id})
+  end
+
+  def handle_call({:in, socket}, _from, state) do
     id = Helpers.id()
     member = %Member{id: id, socket: socket}
     routing = %__MODULE__{id: id, active: false, timestamp: Helpers.unix_now()}
-    with {:ok, pid} <- Supervisor.start_child(member) do
+    with {:ok, pid} <- Supervisor.start_in(member) do
+      ref = Process.monitor(pid)
+      full = Map.put(routing, :ref, ref)
+      new = Map.put(state, id, full)
+      {:reply, pid, new}
+    else
+      _ -> {:reply, {:error, "Routing failed!"}, state}
+    end
+  end
+
+  def handle_call({:out, {ip, port}}, _from, state) do
+    id = Helpers.id()
+    member = %Member{id: id, ip: ip, port: port}
+    routing = %__MODULE__{id: id, active: false, timestamp: Helpers.unix_now()}
+    with {:ok, pid} <- Supervisor.start_out(member) do
+      {key, ip, port, public} = Local.activation()
+      message = %{type: 2, body: %{key: key, ip: ip, port: port, public: public}} |> Jason.encode!()
+      :ok = Member.send(id, {:activate, message <> "\n"})
       ref = Process.monitor(pid)
       full = Map.put(routing, :ref, ref)
       new = Map.put(state, id, full)
@@ -79,6 +104,8 @@ defmodule Shadow.Routing do
       }
       cleared = Map.pop(state, id) |> elem(1)
       new = Map.put(cleared, id, updated)
+      # Return confirmation
+      :ok = Member.send(member.id, %{type: 3, timestamp: Helpers.unix_now})
       {:reply, updated, new}
     else
       {:reply, member, state}
@@ -103,6 +130,7 @@ defmodule Shadow.Routing do
     end)
     exportable = Enum.map(active, fn {k, v} ->
       member = Member.export(k)
+      IO.puts member.ip
       {v.key, %{
 	  ip: member.ip,
 	  port: member.port,
@@ -111,6 +139,12 @@ defmodule Shadow.Routing do
     end)
     transformed = Enum.into(exportable, %{})
     {:reply, transformed, state}
+  end
+
+  def handle_cast({:switch, id}, state) do
+    member = Map.get(state, id)
+    updated = Map.put(member, :active, true)
+    {:noreply, Map.put(state, id, updated)}
   end
 
   def handle_info({:DOWN, ref, _, _, _}, state) do

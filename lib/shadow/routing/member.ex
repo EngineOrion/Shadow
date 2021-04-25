@@ -70,6 +70,7 @@ defmodule Shadow.Routing.Member do
     case message.type do
       0 -> {:noreply, call(message)}
       2 -> {:noreply, activate(message, state)}
+      3 -> {:noreply, confirm(state)}
     end
   end
 
@@ -93,6 +94,11 @@ defmodule Shadow.Routing.Member do
       public: message.public,
       socket: state.socket
     }
+  end
+
+  def confirm(state) do
+    :ok = Routing.switch(state.id)
+    state
   end
 
   defp name(id) do

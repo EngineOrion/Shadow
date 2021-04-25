@@ -13,10 +13,17 @@ defmodule Shadow.Intern.Supervisor do
     DynamicSupervisor.init(strategy: :one_for_one, restart: :temporary, max_restarts: 0)
   end
 
-  def start_child(opts) do
+  def start_in(opts) do
     DynamicSupervisor.start_child(
       __MODULE__,
       {Shadow.Routing.Member, {:in, opts}}
+    )
+  end
+
+  def start_out(opts) do
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      {Shadow.Routing.Member, {:out, opts}}
     )
   end
 end
