@@ -17,8 +17,6 @@ system.
   - Holds the active :gen_tcp connections.
   - Listens for incoming tcp-packets.
   - Two types: :in / :out, :gen_tcp.connect / :gen_tcp.listen.
-* TODOs
-** TODO Unit Testing & Type safety
-** TODO Unix socket communication
-** TODO Test with multiple instances
-** TODO Missing container loop issue.
+* Tasks
+** Unix socket communication
+** Routing send function with target query
