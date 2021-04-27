@@ -2,7 +2,22 @@
 #+AUTHOR: Jakob Klemm
 
 Distributed routing & messaging protocol for the =Engine: Orion= system.
+
+* Architecture
+- Each node is both a server & a router.
+- Each node has a Key (0..2^160). (Randomly generated)
+- Nodes are connected with direct TCP connections.
+* Structure
+- Routing:
+  - Overview of all connected nodes.
+  - Supervises connections & "member-processes".
+  - Decides Routing targets.
+- Member:
+  - Holds the active :gen_tcp connections.
+  - Listens for incoming tcp-packets.
+  - Two types: :in / :out, :gen_tcp.connect / :gen_tcp.listen.
 * TODOs
 ** TODO Unit Testing & Type safety
 ** TODO Unix socket communication
 ** TODO Test with multiple instances
+** TODO Missing container loop issue.

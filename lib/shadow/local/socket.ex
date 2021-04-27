@@ -1,5 +1,4 @@
 defmodule Shadow.Local.Socket do
-
   use GenServer
 
   def start_link(_) do
@@ -7,10 +6,16 @@ defmodule Shadow.Local.Socket do
   end
 
   def init(_) do
-    {:ok, socket} = :gen_tcp.connect({:local, "/home/jeykey/Downloads/shadow/.orion/orion.sock"}, 0, [:binary, active: false, reuseaddr: true])
+    {:ok, socket} =
+      :gen_tcp.connect({:local, "/home/jeykey/Downloads/shadow/.orion/orion.sock"}, 0, [
+        :binary,
+        active: false,
+        reuseaddr: true
+      ])
+
     {:ok, socket}
   end
-  
+
   def send(message) do
     GenServer.cast(:socket, {:send, message})
   end
@@ -21,10 +26,10 @@ defmodule Shadow.Local.Socket do
   end
 
   def handle_info({:tcp, _socket, data}, socket) do
-    IO.puts data
+    IO.puts(data)
     {:noreply, socket}
   end
-  
+
   def handle_info({:tcp_closed, _socket}, _state) do
     Process.exit(self(), :normal)
   end
