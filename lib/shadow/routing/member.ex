@@ -94,9 +94,9 @@ defmodule Shadow.Routing.Member do
     %__MODULE__{
       id: routing.id,
       key: routing.key,
-      ip: message.ip,
-      port: message.port,
-      public: message.public,
+      ip: message.body.ip,
+      port: message.body.port,
+      public: message.body.public,
       socket: state.socket
     }
   end
@@ -122,13 +122,11 @@ defmodule Shadow.Routing.Member do
   already initialized in the router.
   """
   def init({:out, %__MODULE__{} = params}) do
-    with {:ok, socket} <-
-           :gen_tcp.connect(params.ip, params.port, [:binary, keepalive: true, nodelay: true]) do
-      member = Map.put(params, :socket, socket)
-      {:ok, member}
-    else
-      _ -> {:error, "Connection refused"}
-    end
+    IO.inspect params
+    {:ok, socket} = :gen_tcp.connect(to_charlist(params.ip), params.port, [:binary, keepalive: true, nodelay: true])
+    IO.inspect socket
+    member = Map.put(params, :socket, socket)
+    {:ok, member}
   end
 
   def init({:in, %__MODULE__{} = params}) do
@@ -173,13 +171,6 @@ defmodule Shadow.Routing.Member do
     end
   end
 
-  @doc """
-  If a process shuts down (for whatever reason) the member process
-  will also stop.
-
-  In the future at this point the message log should be written into a
-  log / temp file.
-  """
   def handle_info({:tcp_closed, _socket}, _state) do
     Process.exit(self(), :normal)
   end

@@ -94,8 +94,7 @@ defmodule Shadow.Routing.Message do
           ip: ip,
           port: port,
           public: public
-        },
-        timestamp: Helpers.unix_now()
+        }
       }
     else
       _ -> {:error, "Message not valid!"}

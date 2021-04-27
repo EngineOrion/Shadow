@@ -65,8 +65,8 @@ defmodule Shadow.Routing do
   outgoing processes, where no socket, but the target IP & Port are
   available.
   """
-  def outgoing(ip, port) do
-    GenServer.call(:routing, {:out, {ip, port}})
+  def outgoing({key, ip, port, public}) do
+    GenServer.call(:routing, {:out, {key, ip, port, public}})
   end
 
   @doc """
@@ -141,21 +141,26 @@ defmodule Shadow.Routing do
     end
   end
 
-  def handle_call({:out, {ip, port}}, _from, state) do
+  def handle_call({:out, {key, ip, port, public}}, _from, state) do
     id = Helpers.id()
-    member = %Member{id: id, ip: ip, port: port}
+    member = %Member{id: id, key: key, ip: ip, port: port, public: public}
     routing = %__MODULE__{id: id, active: false, timestamp: Helpers.unix_now()}
 
     with {:ok, pid} <- Supervisor.start_out(member) do
-      {key, ip, port, public} = Local.activation()
+      {lkey, lip, lport, lpublic} = Local.activation()
 
+      IO.inspect pid
+      
+      # TODO: Move into type save, dedicated function, not brute force way.
+      
       message =
-        %{type: 2, body: %{key: key, ip: ip, port: port, public: public}} |> Jason.encode!()
+        %{type: 2, timestamp: Helpers.unix_now(), body: %{key: lkey, ip: lip, port: lport, public: lpublic}} |> Jason.encode!()
 
-      :ok = Member.send(id, {:activate, message <> "\n"})
+      :ok = Member.send(id, message <> "\n")
       ref = Process.monitor(pid)
       full = Map.put(routing, :ref, ref)
       new = Map.put(state, id, full)
+
       {:reply, pid, new}
     else
       _ -> {:reply, {:error, "Routing failed!"}, state}
@@ -168,7 +173,7 @@ defmodule Shadow.Routing do
     if not member.active do
       updated = %__MODULE__{
         id: id,
-        key: message.key,
+        key: message.body.key,
         ref: member.ref,
         timestamp: member.timestamp,
         active: true

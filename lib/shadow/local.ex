@@ -6,8 +6,6 @@ defmodule Shadow.Local do
   interfacing with the config.
   """
 
-  alias Shadow.Routing.Member
-
   require Logger
 
   @doc """
@@ -43,8 +41,7 @@ defmodule Shadow.Local do
          {:ok, ip} <- Map.fetch(server, "ip"),
          {:ok, port} <- Map.fetch(server, "port"),
          {:ok, public} <- Map.fetch(server, "public") do
-      m = %Member{key: key, ip: ip, port: port, public: public}
-      Member.start_link({:out, m})
+      Shadow.Routing.outgoing({key, ip, port, public})
     else
       _ -> failed()
     end
@@ -70,11 +67,16 @@ defmodule Shadow.Local do
   """
   def activation() do
     config = read()
-    key = Map.fetch!(config, "key")
-    ip = Map.fetch!(config, "ip")
-    port = Map.fetch!(config, "port")
-    public = Map.fetch!(config, "public")
-    {key, ip, port, public}
+    with {:ok, server} <- Map.fetch(config, "__SERVER__"),
+	 {:ok, key} <- Map.fetch(server, "key"),
+	 {:ok, ip} <- Map.fetch(server, "ip"),
+	 {:ok, port} <- Map.fetch(server, "port"),
+	 {:ok, public} <- Map.fetch(server, "public")
+      do
+      {key, ip, port, public}
+      else
+	_ -> {:error, "Config Invalid!"}
+    end
   end
 
   @doc """

@@ -1,8 +1,0 @@
-{
-    "__SERVER__": {
-        "public": "qwertzuiopü",
-        "port": 8080,
-        "key": 42,
-        "ip": "localhost"
-    }
-}
