@@ -1,18 +1,8 @@
 defmodule Shadow do
   @moduledoc """
   Documentation for `Shadow`.
-  """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Shadow.hello()
-      :world
+  Future entry point & (admin) interface for the node.
 
   """
-  def hello do
-    :world
-  end
 end

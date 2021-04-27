@@ -1,6 +1,4 @@
 defmodule Shadow.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
@@ -8,16 +6,22 @@ defmodule Shadow.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: Shadow.Worker.start_link(arg)
-      # {Shadow.Worker, arg}
-      {Shadow.Verification.Worker, []},
-      {Shadow.Routing.Table, []}
-      # Shadow.Listener,
+      {Shadow.Intern.Supervisor, []},
+      listener(),
+      {Shadow.Routing, []},
+      {Shadow.Intern.Registry, []}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Shadow.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp listener() do
+    %{
+      id: Shadow.Listener,
+      start: {Shadow.Listener, :start_link, [Shadow.Intern.Helpers.port()]},
+      type: :worker,
+      restart: :permanent
+    }
   end
 end
