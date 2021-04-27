@@ -1,5 +1,5 @@
 defmodule Shadow.Local.Portal do
-  @mmoduledoc """
+  @moduledoc """
   Responsible for interfacing with the orion unix socket.
 
   TODO: Remove hard coded path.
@@ -28,10 +28,6 @@ defmodule Shadow.Local.Portal do
       ])
 
     {:ok, socket}
-  end
-
-  def send(message) do
-    GenServer.cast(:socket, {:send, message})
   end
 
   def handle_cast({:send, message}, socket) do

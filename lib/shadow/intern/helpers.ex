@@ -5,7 +5,7 @@ defmodule Shadow.Intern.Helpers do
   somewhere else as well. This module should act as a dependency-less
   solution.
   """
-  
+
   @doc """
   Get the current system time from DateTime and convert it to unix_time.
   """

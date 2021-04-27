@@ -1,7 +1,7 @@
 defmodule Shadow.Intern.Supervisor do
   @moduledoc """
   Dynamic supervisor for managing Member connections.
-  
+
   Restarting issue:
 
   In theory processes shouldn't restart if the termination reason was
@@ -30,11 +30,13 @@ defmodule Shadow.Intern.Supervisor do
     )
   end
 
-  @doc """ 
+  @doc """
   Start a new member for outgoing connections. 
   """
   def start_out(opts) do
-    DynamicSupervisor.start_child( __MODULE__,
-      {Shadow.Routing.Member, {:out, opts}} )
+    DynamicSupervisor.start_child(
+      __MODULE__,
+      {Shadow.Routing.Member, {:out, opts}}
+    )
   end
 end

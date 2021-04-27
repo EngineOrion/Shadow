@@ -10,18 +10,8 @@ defmodule Shadow.Routing do
   fulfills some of its functions. While this would introduce a third
   supervisor into the codebase, the actual file wouldn't have to
   change a lot, since it mostly relies on GenServer callbacks.
-  """
 
-  use GenServer
-
-  alias Shadow.Local
-  alias Shadow.Intern.Supervisor
-  alias Shadow.Routing.Member
-  alias Shadow.Routing.Key
-  alias Shadow.Intern.Helpers
-
-  @typedoc """
-
+  Struct:
   This struct is similiar to %Member{}, but with some different
   fields. Since the Router does not have to know about sockets and the
   Member does not have to know about the reference this split is not
@@ -36,8 +26,15 @@ defmodule Shadow.Routing do
 
   The active flag is used to determine whether a Member has been
   activated and is authorized to receive messages.
-
   """
+
+  use GenServer
+
+  alias Shadow.Local
+  alias Shadow.Intern.Supervisor
+  alias Shadow.Routing.Member
+  alias Shadow.Routing.Key
+  alias Shadow.Intern.Helpers
 
   defstruct [:id, :key, :active, :ref, :timestamp]
 
@@ -76,7 +73,7 @@ defmodule Shadow.Routing do
   If the member receives an activation message (Type 2) this function
   gets called to both update the routing entry and the Member process
   with the newest information.
-  
+
   This function is ACTIVE and will send a confirmation (Type 3) to the
   remote Member.
   """

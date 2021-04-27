@@ -2,11 +2,11 @@ defmodule Shadow.Intern.Registry do
   @moduledoc """
   Elixir Registry for Member processes. (No real modifications to the
   default registry, but is stored dedicated for future expansion).
-  
+
   The advantage of using {:via, Registry, key} is that the ID can be a
   string / int, not just an atom. Members are registered using the ID.
   """
-  
+
   use GenServer
 
   def start_link(_state) do

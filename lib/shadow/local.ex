@@ -8,6 +8,8 @@ defmodule Shadow.Local do
 
   alias Shadow.Routing.Member
 
+  require Logger
+
   @doc """
   Fetches the local routing table & __SERVER__ config and writes it to
   a public member file. It removes the "containers" section and
@@ -16,8 +18,9 @@ defmodule Shadow.Local do
   def generate() do
     routing = Shadow.Routing.export()
     config = Map.delete(read(), "containers")
+
     with {:ok, body} <- Jason.encode(Map.merge(config, routing)) do
-      File.write(member(), content)
+      File.write(member(), body)
     else
       _ -> failed()
     end
@@ -34,13 +37,12 @@ defmodule Shadow.Local do
   """
   def import(path) do
     with {:ok, file} <- File.read(path),
-	 {:ok, member} <- Jason.decode(),
-	 {:ok, server} <- Map.fetch(member, "__SERVER__"),
-	 {:ok, key} <- Map.fetch(server, "key"),
-	 {:ok, ip} <- Map.fetch(server, "ip"),
-	 {:ok, port} <- Map.fetch(server, "port"),
-	 {:ok, public} <- Map.fetch(server, "public")
-      do
+         {:ok, member} <- Jason.decode(file),
+         {:ok, server} <- Map.fetch(member, "__SERVER__"),
+         {:ok, key} <- Map.fetch(server, "key"),
+         {:ok, ip} <- Map.fetch(server, "ip"),
+         {:ok, port} <- Map.fetch(server, "port"),
+         {:ok, public} <- Map.fetch(server, "public") do
       m = %Member{key: key, ip: ip, port: port, public: public}
       Member.start_link({:out, m})
     else
@@ -55,7 +57,7 @@ defmodule Shadow.Local do
   """
   def is_local?(key) do
     with {:ok, locals} <- Map.fetch(read(), "containers"),
-	 {:ok, _name} <- Map.fetch(locals, Integer.to_string(key)) do
+         {:ok, _name} <- Map.fetch(locals, Integer.to_string(key)) do
       true
     else
       _ -> false
@@ -82,12 +84,11 @@ defmodule Shadow.Local do
   """
   def read() do
     with {:ok, config} <- File.read(config()),
-	 {:ok, decoded} <- Jason.decode()
-      do
+         {:ok, decoded} <- Jason.decode(config) do
       decoded
-      else
-	# Warning: No real type safety. Application can't run without valid config!
-	_ -> failed()
+    else
+      # Warning: No real type safety. Application can't run without valid config!
+      _ -> failed()
     end
   end
 

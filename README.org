@@ -1,7 +1,8 @@
 #+TITLE: Orion: Shadow
 #+AUTHOR: Jakob Klemm
 
-Distributed routing & messaging protocol for the =Engine: Orion= system.
+Distributed routing & messaging protocol for the =Engine: Orion=
+system.
 
 * Architecture
 - Each node is both a server & a router.

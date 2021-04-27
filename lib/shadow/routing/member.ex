@@ -45,7 +45,7 @@ defmodule Shadow.Routing.Member do
   end
 
   #  - - - - - - Interface - - - - - - 
-  
+
   @doc """
   Send a message to the remote node using the socket.
 
@@ -62,7 +62,23 @@ defmodule Shadow.Routing.Member do
     GenServer.call(name(id), :export)
   end
 
-  @doc """ 
+  @doc """
+  Once a message of type 0 has been received it is forwareded to the
+  appropriate target. This uses the Routing module to determine the
+  optimal node and to figure out if it is a local target. Then the
+  message is send, returning the original state again.
+  
+  This function is meant to be called in the receive function of the
+  GenServer, which needs to return the new state. Therefor "state" is
+  handled as a passthrough parameter.
+  """
+  def call(message, state) do
+    target = Routing.target(message)
+    :ok = Routing.send(target, message)
+    state
+  end
+
+  @doc """
   Function for activating the member in the router & updating the
   local state with the new data. It takes in the activation message
   from the remote node, calls to update the router and than returns a
@@ -74,6 +90,7 @@ defmodule Shadow.Routing.Member do
   """
   def activate(message, state) do
     routing = Routing.activate(state.id, message)
+
     %__MODULE__{
       id: routing.id,
       key: routing.key,
@@ -100,7 +117,7 @@ defmodule Shadow.Routing.Member do
   For outgoing connections the :gen_tcp socket is initialized in the
   init function. By this time it will already be part of the router,
   therefor it can be started on its own.
-  
+
   Starting with :in simply passes on the state, since all objects were
   already initialized in the router.
   """
@@ -141,23 +158,22 @@ defmodule Shadow.Routing.Member do
   @doc """
   The central entry point for incoming :tcp messages. From here any
   messages will get processed by Message.process/1.
-  
+
   Messages will land here because ownership was transfered to this
   process. 
   """
 
   def handle_info({:tcp, _socket, data}, state) do
-  message = Message.process(data)
+    message = Message.process(data)
 
     case message.type do
-      0 -> {:noreply, call(message)}
+      0 -> {:noreply, call(message, state)}
       2 -> {:noreply, activate(message, state)}
       3 -> {:noreply, confirm(state)}
     end
   end
 
   @doc """
-
   If a process shuts down (for whatever reason) the member process
   will also stop.
 
@@ -169,7 +185,7 @@ defmodule Shadow.Routing.Member do
   end
 
   #  - - - - - - HELPER - - - - - - 
-  
+
   defp name(id) do
     {:via, Shadow.Intern.Registry, id}
   end

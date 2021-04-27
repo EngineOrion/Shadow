@@ -5,7 +5,7 @@ defmodule Shadow.Routing.Key do
   Generates a completly random key in the entire keyspace. This
   function will not be used beyond initial setup or resets, since
   later keys will be weightet / not random.
-  
+
   Returns the new key as an integer.
   """
   def new do
