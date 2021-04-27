@@ -13,9 +13,8 @@ defmodule Shadow.Routing.Member do
 
   Active: Only after public, key & other values have been established
   (handshake) can the connection be used.
-  """
-
-  @typedoc """
+  
+  Struct:
   Each Member state only holds a single %Member{} struct. In there all
   relevant data will be stored. 
 
@@ -27,6 +26,7 @@ defmodule Shadow.Routing.Member do
   TODO: Expand fields with message log (memory only) (for admin /
   debug purposes).
   """
+
   @derive Jason.Encoder
   defstruct [:id, :key, :ip, :port, :public, :socket]
 
