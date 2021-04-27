@@ -29,8 +29,6 @@ defmodule Shadow.Routing.Message do
 
   defstruct [:type, :source, :target, :timestamp, :body]
 
-  alias Shadow.Intern.Helpers
-
   @doc """
   Entry point for the processing system. It will decode each incoming
   (binray) message into a map and extract the type. From there the
@@ -62,7 +60,7 @@ defmodule Shadow.Routing.Message do
   # Type 3: Activation Confirmation
 
   Since the actual body is irrelevant for an activation confirmation
-  :ok is returned instead.
+  an empty object with just the type is returned.
   """
   def process(0, message) do
     with {:ok, source} <- Map.fetch(message, "source"),
@@ -102,6 +100,6 @@ defmodule Shadow.Routing.Message do
   end
 
   def process(3, _message) do
-    :ok
+    %__MODULE__{type: 3}
   end
 end

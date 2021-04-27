@@ -149,10 +149,7 @@ defmodule Shadow.Routing do
     with {:ok, pid} <- Supervisor.start_out(member) do
       {lkey, lip, lport, lpublic} = Local.activation()
 
-      IO.inspect pid
-      
       # TODO: Move into type save, dedicated function, not brute force way.
-      
       message =
         %{type: 2, timestamp: Helpers.unix_now(), body: %{key: lkey, ip: lip, port: lport, public: lpublic}} |> Jason.encode!()
 
@@ -182,7 +179,9 @@ defmodule Shadow.Routing do
       cleared = Map.pop(state, id) |> elem(1)
       new = Map.put(cleared, id, updated)
       # Return confirmation
-      :ok = Member.send(member.id, %{type: 3, timestamp: Helpers.unix_now()})
+      # TODO: Move to function (with activation) & add safety.
+      confirmation = %{type: 3, timestamp: Helpers.unix_now()} |> Jason.encode!()
+      :ok = Member.send(member.id, confirmation <> "\n")
       {:reply, updated, new}
     else
       {:reply, member, state}
@@ -210,7 +209,6 @@ defmodule Shadow.Routing do
     exportable =
       Enum.map(active, fn {k, v} ->
         member = Member.export(k)
-        IO.puts(member.ip)
 
         {v.key,
          %{

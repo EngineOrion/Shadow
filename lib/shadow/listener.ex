@@ -40,7 +40,6 @@ defmodule Shadow.Listener do
   end
 
   @doc """
-
   Once a connection from the listening socket comes in it is accepted
   and a member is started. This happens in the Router, from where the
   Supervisor is called. Once the process is started, the ownership /
@@ -49,7 +48,6 @@ defmodule Shadow.Listener do
 
   At the end the function calls itself again, so that new connections
   can be accepted.
-
   """
   def loop(listen) do
     {:ok, socket} = :gen_tcp.accept(listen)

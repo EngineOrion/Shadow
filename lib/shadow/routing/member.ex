@@ -122,9 +122,7 @@ defmodule Shadow.Routing.Member do
   already initialized in the router.
   """
   def init({:out, %__MODULE__{} = params}) do
-    IO.inspect params
     {:ok, socket} = :gen_tcp.connect(to_charlist(params.ip), params.port, [:binary, keepalive: true, nodelay: true])
-    IO.inspect socket
     member = Map.put(params, :socket, socket)
     {:ok, member}
   end
