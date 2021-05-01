@@ -101,7 +101,7 @@ defmodule Shadow.Local do
   - Hard coded names: Currenlty it is not possible to change the name of the config or other files. 
   """
   def config() do
-    Application.fetch_env!(:shadow, :path) <> "config.json"
+    path() <> "config.json"
   end
 
   @doc """
@@ -110,6 +110,14 @@ defmodule Shadow.Local do
   file.
   """
   def member() do
-    Application.fetch_env!(:shadow, :path) <> "member.json"
+    path() <> "member.json"
   end
+
+  @doc """
+  Gets the path of the config directory from the ex-config.
+  """
+  def path() do
+    Application.fetch_env!(:shadow, :path)
+  end
+  
 end

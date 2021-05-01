@@ -18,5 +18,5 @@ system.
   - Listens for incoming tcp-packets.
   - Two types: :in / :out, :gen_tcp.connect / :gen_tcp.listen.
 * Tasks
-** Unix socket communication
-** Routing send function with target query
+** Move to external config
+** Add message log
