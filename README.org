@@ -19,4 +19,3 @@ system.
   - Two types: :in / :out, :gen_tcp.connect / :gen_tcp.listen.
 * Tasks
 ** Move to external config
-** Add message log

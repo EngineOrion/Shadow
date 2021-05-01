@@ -192,7 +192,8 @@ defmodule Shadow.Routing do
     if Local.is_local?(message.target) do
       {:reply, :__SERVER__, state}
     else
-      distanced = Enum.map(state, fn {_k, v} -> Key.distance(message.target, v.key) end)
+      already = Enum.reject(state, fn {_k, v} -> Enum.member?(message.history, v.key) end)
+      distanced = Enum.map(already, fn {_k, v} -> Key.distance(message.target, v.key) end)
 
       min = Enum.min(distanced)
       member = Enum.find(state, fn x -> min == Key.distance(message.target, x) end)

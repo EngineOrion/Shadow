@@ -27,7 +27,7 @@ defmodule Shadow.Routing.Message do
   threshold -> disregard)
   """
 
-  defstruct [:type, :source, :target, :timestamp, :body]
+  defstruct [:type, :source, :target, :timestamp, :body, :history]
 
   @doc """
   Entry point for the processing system. It will decode each incoming
@@ -66,12 +66,14 @@ defmodule Shadow.Routing.Message do
     with {:ok, source} <- Map.fetch(message, "source"),
          {:ok, target} <- Map.fetch(message, "target"),
          {:ok, timestamp} <- Map.fetch(message, "timestamp"),
+	 {:ok, history} <- Map.fetch(message, "history"),
          {:ok, body} <- Map.fetch(message, "body") do
       %__MODULE__{
         type: 0,
         source: source,
         target: target,
         timestamp: timestamp,
+	history: history,
         body: body
       }
     else
