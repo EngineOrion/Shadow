@@ -41,7 +41,7 @@ defmodule Shadow.Routing do
   @doc """
   Starts a new Routing process. Each node can only have one, since its
   name is hard coded. The initial state is irrelevant since it will be
-  build dynamically later. 
+  build dynamically later.
   """
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: :routing)
@@ -94,7 +94,7 @@ defmodule Shadow.Routing do
   @doc """
 
   Takes in a target (object, not key) and a message. Then sends the
-  message to the node. 
+  message to the node.
 
   TODO: Unify input types, make all objects or all ids.
   If the target is __SERVER__, the local module is used.
@@ -118,7 +118,7 @@ defmodule Shadow.Routing do
   @doc """
 
   If the node has received an activation confirmation (Type 3) the
-  active flag simply needs to be switched. 
+  active flag simply needs to be switched.
 
   This function is PASSIV.
   """
@@ -196,8 +196,8 @@ defmodule Shadow.Routing do
       distanced = Enum.map(already, fn {_k, v} -> Key.distance(message.target, v.key) end)
 
       min = Enum.min(distanced)
-      member = Enum.find(state, fn x -> min == Key.distance(message.target, x) end)
-      {:reply, member, state}
+      member = Enum.find(already, fn {_k, v} -> min == Key.distance(message.target, v.key) end)
+      {:reply, elem(member, 1), state}
     end
   end
 

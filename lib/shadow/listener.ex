@@ -9,7 +9,7 @@ defmodule Shadow.Listener do
 
   Once a connection is found it is accepted, a new member is started &
   registered with the Router & Supervisor and ownership is transfered
-  to that pid. 
+  to that pid.
 
   """
 
@@ -52,6 +52,7 @@ defmodule Shadow.Listener do
   def loop(listen) do
     {:ok, socket} = :gen_tcp.accept(listen)
     pid = Shadow.Routing.incoming(socket)
+	IO.inspect "new connection."
     :gen_tcp.controlling_process(socket, pid)
     loop(listen)
   end
