@@ -53,11 +53,11 @@ defmodule Shadow.Local do
   from a foreign node and false is returned.
   """
   def is_local?(key) do
-    with {:ok, locals} <- Map.fetch(read(), "containers"),
-         {:ok, _name} <- Map.fetch(locals, Integer.to_string(key)) do
+    {local, 0} = System.cmd("hunter", ["get", "key", key])
+    if String.length(local) > 3 do
       true
     else
-      _ -> false
+      false
     end
   end
 
@@ -66,9 +66,8 @@ defmodule Shadow.Local do
   (Type 2). Returns them as a 4 part tuple:
   """
   def activation() do
-    config = read()
-    with {:ok, server} <- Map.fetch(config, "__SERVER__"),
-	 {:ok, key} <- Map.fetch(server, "key"),
+    server = read()
+    with {:ok, key} <- Map.fetch(server, "key"),
 	 {:ok, ip} <- Map.fetch(server, "ip"),
 	 {:ok, port} <- Map.fetch(server, "port"),
 	 {:ok, public} <- Map.fetch(server, "public")
@@ -80,14 +79,12 @@ defmodule Shadow.Local do
   end
 
   @doc """
-  Gets & decodes the local config file. This function is only
-  partially type safe. But since the application won't work properly
-  without valid config there is no reason to add safety.
+  Currently not typesafe, uses toe hunter cli to fetch the stored config.
   """
   def read() do
-    with {:ok, config} <- File.read(config()),
-         {:ok, decoded} <- Jason.decode(config) do
-      decoded
+    {c, 0} = System.cmd("hunter", ["get", "config"])
+    with {:ok, config} <- Jason.decode(c) do
+      Map.fetch!(config, "sources") |> Enum.filter(fn x -> Map.fetch!(x, "name") == "shadow" end) |> Enum.at(0)
     else
       # Warning: No real type safety. Application can't run without valid config!
       _ -> failed()
@@ -98,7 +95,7 @@ defmodule Shadow.Local do
   Fetches the path value from the Elixir config & appends "config.json", not type safe.
   Issues:
   - Safety: Without valid config (both elixir & orion) the application will fail.
-  - Hard coded names: Currenlty it is not possible to change the name of the config or other files. 
+  - Hard coded names: Currenlty it is not possible to change the name of the config or other files.
   """
   def config() do
     path() <> "config.json"
@@ -119,5 +116,4 @@ defmodule Shadow.Local do
   def path() do
     Application.fetch_env!(:shadow, :path)
   end
-  
 end

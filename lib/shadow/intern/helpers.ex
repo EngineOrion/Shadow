@@ -33,7 +33,7 @@ defmodule Shadow.Intern.Helpers do
   ip_addr/0 apply).
   """
   def port() do
-    Application.fetch_env!(:shadow, :port)
+    Shadow.Local.read() |> Map.fetch!("port")
   end
 
   @doc """
