@@ -29,7 +29,6 @@ defmodule Shadow.Local.Portal do
 
   def handle_info({:tcp, _socket, data}, state) do
     message = Message.process(data)
-    IO.puts message
     Shadow.send(message)
     {:noreply, state}
   end

@@ -15,7 +15,7 @@ defmodule Shadow.Routing do
   This struct is similiar to %Member{}, but with some different
   fields. Since the Router does not have to know about sockets and the
   Member does not have to know about the reference this split is not
-  an issue.
+
 
   Since before the activation the "Key" is unknown the ID is used as a
   node-unique ID. It will not be exported or persisted, but is simply

@@ -14,10 +14,11 @@ defmodule Shadow.Local do
   encodes everything in json.
   """
   def generate() do
-    routing = Shadow.Routing.export()
-    config = Map.delete(read(), "containers")
+    #routing = Shadow.Routing.export()
+    #config = Map.delete(read(), "containers")
 
-    with {:ok, body} <- Jason.encode(Map.merge(config, routing)) do
+    #with {:ok, body} <- Jason.encode(Map.merge(config, routing)) do
+    with {:ok, body} <- Jason.encode(Map.replace(%{"__SERVER__" => read()}, "ip", Shadow.Intern.Helpers.ip_addr())) do
       File.write(member(), body)
     else
       _ -> failed()
@@ -53,7 +54,7 @@ defmodule Shadow.Local do
   from a foreign node and false is returned.
   """
   def is_local?(key) do
-    {local, 0} = System.cmd("hunter", ["get", "key", key])
+    {local, 0} = System.cmd("hunter", ["get", "key", Integer.to_string(key)])
     if String.length(local) > 3 do
       true
     else
