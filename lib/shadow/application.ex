@@ -9,7 +9,8 @@ defmodule Shadow.Application do
       {Shadow.Intern.Supervisor, []},
       listener(),
       {Shadow.Routing, []},
-      {Shadow.Intern.Registry, []}
+      {Shadow.Intern.Registry, []},
+      {Shadow.Local.Portal, []},
     ]
 
     opts = [strategy: :one_for_one, name: Shadow.Supervisor]

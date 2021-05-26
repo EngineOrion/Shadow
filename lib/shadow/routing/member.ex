@@ -5,7 +5,7 @@ defmodule Shadow.Routing.Member do
   This object (struc) will also be stored by the routing table
   process, "ref" is a monitoring reference to the process.
 
-  Type: 
+  Type:
   - in: (incoming) Connection held by this node (listener).
   - out: (outgoing) Outgoing connection to another node.
 
@@ -13,12 +13,12 @@ defmodule Shadow.Routing.Member do
 
   Active: Only after public, key & other values have been established
   (handshake) can the connection be used.
-  
+
   Struct:
   Each Member state only holds a single %Member{} struct. In there all
-  relevant data will be stored. 
+  relevant data will be stored.
 
-  Naming: 
+  Naming:
   - Key: Shadow ID / IP System for addressing nodes & containers.
   - Public: Public RSA "Key", currenlty unused, integrate with crypto
     module later.
@@ -44,7 +44,7 @@ defmodule Shadow.Routing.Member do
     GenServer.start_link(__MODULE__, {type, params}, name: name(params.id))
   end
 
-  #  - - - - - - Interface - - - - - - 
+  #  - - - - - - Interface - - - - - -
 
   @doc """
   Send a message to the remote node using the socket.
@@ -67,14 +67,18 @@ defmodule Shadow.Routing.Member do
   appropriate target. This uses the Routing module to determine the
   optimal node and to figure out if it is a local target. Then the
   message is send, returning the original state again.
-  
+
   This function is meant to be called in the receive function of the
   GenServer, which needs to return the new state. Therefor "state" is
   handled as a passthrough parameter.
   """
   def call(message, state) do
-    target = Routing.target(message)
-    :ok = Routing.send(target, message)
+    #target = Routing.target(message)
+    #:ok = Routing.send(target, message)
+
+    IO.puts " - - - - - - - New message received! - - - - - - -"
+    IO.inspect message
+    IO.puts " - - - - - - - - - - - - - - - - - - - - - - - - -"
     state
   end
 
@@ -82,11 +86,11 @@ defmodule Shadow.Routing.Member do
   Function for activating the member in the router & updating the
   local state with the new data. It takes in the activation message
   from the remote node, calls to update the router and than returns a
-  new state. 
+  new state.
 
   This function should not usually be called externaly, since it
   requires the state of the member process. Instead it should get
-  called by a handle_* function. 
+  called by a handle_* function.
   """
   def activate(message, state) do
     routing = Routing.activate(state.id, message)
@@ -111,7 +115,7 @@ defmodule Shadow.Routing.Member do
     state
   end
 
-  #  - - - - - - Callbacks - - - - - - 
+  #  - - - - - - Callbacks - - - - - -
 
   @doc """
   For outgoing connections the :gen_tcp socket is initialized in the
@@ -149,14 +153,14 @@ defmodule Shadow.Routing.Member do
     {:reply, state, state}
   end
 
-  # - - - - - - TCP - - - - - - 
+  # - - - - - - TCP - - - - - -
 
   @doc """
   The central entry point for incoming :tcp messages. From here any
   messages will get processed by Message.process/1.
 
   Messages will land here because ownership was transfered to this
-  process. 
+  process.
   """
 
   def handle_info({:tcp, _socket, data}, state) do
@@ -173,7 +177,7 @@ defmodule Shadow.Routing.Member do
     Process.exit(self(), :normal)
   end
 
-  #  - - - - - - HELPER - - - - - - 
+  #  - - - - - - HELPER - - - - - -
 
   defp name(id) do
     {:via, Shadow.Intern.Registry, id}

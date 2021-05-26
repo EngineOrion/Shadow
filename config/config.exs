@@ -1,5 +1,5 @@
 import Config
 
 config :shadow,
-  path: ".orion/",
+  path: "/etc/orion/",
   port: 4242

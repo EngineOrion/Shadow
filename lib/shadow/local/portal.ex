@@ -8,7 +8,7 @@ defmodule Shadow.Local.Portal do
   alias Shadow.Local
   alias Shadow.Routing.Message
 
-  def start_link do
+  def start_link(_params) do
     GenServer.start_link(__MODULE__, :ok, name: :portal)
   end
 
@@ -18,7 +18,7 @@ defmodule Shadow.Local.Portal do
 
   def init(_params) do
     path = Local.path() <> "shadow.sock"
-    {:ok, socket} = :gen_tcp.connect({:local, path}, 0, [:binary, keepalive: true, nodelay: true])
+    {:ok, socket} = :gen_tcp.connect({:local, path}, 0, [:binary])
     {:ok, socket}
   end
 
@@ -29,6 +29,7 @@ defmodule Shadow.Local.Portal do
 
   def handle_info({:tcp, _socket, data}, state) do
     message = Message.process(data)
+    IO.puts message
     Shadow.send(message)
     {:noreply, state}
   end
