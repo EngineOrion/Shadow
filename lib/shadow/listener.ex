@@ -48,6 +48,8 @@ defmodule Shadow.Listener do
 
   At the end the function calls itself again, so that new connections
   can be accepted.
+  
+  TODO: Remove debugging printout.
   """
   def loop(listen) do
     {:ok, socket} = :gen_tcp.accept(listen)

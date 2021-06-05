@@ -14,10 +14,6 @@ defmodule Shadow.Local do
   encodes everything in json.
   """
   def generate() do
-    #routing = Shadow.Routing.export()
-    #config = Map.delete(read(), "containers")
-
-    #with {:ok, body} <- Jason.encode(Map.merge(config, routing)) do
     with {:ok, body} <- Jason.encode(Map.replace(%{"__SERVER__" => read()}, "ip", Shadow.Intern.Helpers.ip_addr())) do
       File.write(member(), body)
     else
@@ -81,6 +77,9 @@ defmodule Shadow.Local do
 
   @doc """
   Currently not typesafe, uses toe hunter cli to fetch the stored config.
+  
+  If the local config is not valid, the entire application will not
+  start properly, therefor type safety is not required.
   """
   def read() do
     {c, 0} = System.cmd("hunter", ["get", "config"])

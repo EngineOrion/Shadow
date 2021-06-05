@@ -2,11 +2,20 @@
 #+AUTHOR: Jakob Klemm
 
 Distributed routing & messaging protocol for the =Engine: Orion=
-system.
+system using =Elixir= and =TCP-Sockets=.
 
+* Getting started
+How to setup nodes & a cluster:
+- Start the =hunter= router on each node.
+- Populate the config, both for =hunter=, as well as for =shadow=.
+- Start =shadow= on all nodes.
+- Generate a =member.json= file on one of the nodes.
+- Move that file to the other node & import it.
+- (This program requires other components in =Engine: Orion= to work
+  properly & process useful data).
 * Architecture
 - Each node is both a server & a router.
-- Each node has a Key (0..2^160). (Randomly generated)
+- Each node has a key (0..2^160).
 - Nodes are connected with direct TCP connections.
 * Structure
 - Routing:
@@ -17,5 +26,3 @@ system.
   - Holds the active :gen_tcp connections.
   - Listens for incoming tcp-packets.
   - Two types: :in / :out, :gen_tcp.connect / :gen_tcp.listen.
-* Tasks
-** Move to external config

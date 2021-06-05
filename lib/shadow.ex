@@ -1,8 +1,6 @@
 defmodule Shadow do
   @moduledoc """
-  Documentation for `Shadow`.
-
-  Entry point & (admin) interface for the node.
+  Entry point & interface for the node.
   """
 
   alias Shadow.Routing
@@ -17,8 +15,11 @@ defmodule Shadow do
     Routing.send(target, updated)
   end
 
+  @doc """
+  Simple function to send a fully configured message through the system.
+  """
   def test_send(target, body) do
-    msg = %{type: 0, source: 1000, target: target, timestamp: 0, history: [], body: body}
+    msg = %{type: 0, source: 1000, target: target, timestamp: 0, body: body}
     encoded = Jason.encode!(msg) <> "\n"
     targetMember = Routing.target(msg)
     Routing.send(targetMember, encoded)

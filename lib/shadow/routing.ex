@@ -1,6 +1,5 @@
 defmodule Shadow.Routing do
   @moduledoc """
-
   Core decision unit of the Shadow-System. The routing system is
   responsible for determining where packets should be sent, as well as
   supervising all connected members.
@@ -108,15 +107,6 @@ defmodule Shadow.Routing do
   end
 
   @doc """
-  Returns the entire relevant Routing Table. It won't change the state
-  at all but will process & return each entry in the table.
-  """
-  def export() do
-    GenServer.call(:routing, :export)
-  end
-
-  @doc """
-
   If the node has received an activation confirmation (Type 3) the
   active flag simply needs to be switched.
 
@@ -149,9 +139,13 @@ defmodule Shadow.Routing do
     with {:ok, pid} <- Supervisor.start_out(member) do
       {lkey, lip, lport, lpublic} = Local.activation()
 
-      # TODO: Move into type save, dedicated function, not brute force way.
       message =
-        %{type: 2, timestamp: Helpers.unix_now(), body: %{key: lkey, ip: lip, port: lport, public: lpublic}} |> Jason.encode!()
+        %{
+          type: 2,
+          timestamp: Helpers.unix_now(),
+          body: %{key: lkey, ip: lip, port: lport, public: lpublic}
+        }
+        |> Jason.encode!()
 
       :ok = Member.send(id, message <> "\n")
       ref = Process.monitor(pid)
@@ -178,8 +172,6 @@ defmodule Shadow.Routing do
 
       cleared = Map.pop(state, id) |> elem(1)
       new = Map.put(cleared, id, updated)
-      # Return confirmation
-      # TODO: Move to function (with activation) & add safety.
       confirmation = %{type: 3, timestamp: Helpers.unix_now()} |> Jason.encode!()
       :ok = Member.send(member.id, confirmation <> "\n")
       {:reply, updated, new}
@@ -192,35 +184,16 @@ defmodule Shadow.Routing do
     if Local.is_local?(message.target) do
       {:reply, :__SERVER__, state}
     else
-      already = Enum.reject(state, fn {_k, v} -> Enum.member?(message.history, v.key) end)
-      distanced = Enum.map(already, fn {_k, v} -> Key.distance(message.target, v.key) end)
+      if Enum.count(state) == 0 do
+        {:reply, :__SERVER__, state}
+      else
+        distanced = Enum.map(state, fn {_k, v} -> Key.distance(message.target, v.key) end)
 
-      min = Enum.min(distanced)
-      member = Enum.find(already, fn {_k, v} -> min == Key.distance(message.target, v.key) end)
-      {:reply, elem(member, 1), state}
+        min = Enum.min(distanced)
+        member = Enum.find(state, fn {_k, v} -> min == Key.distance(message.target, v.key) end)
+        {:reply, elem(member, 1), state}
+      end
     end
-  end
-
-  def handle_call(:export, _from, state) do
-    active =
-      Enum.filter(state, fn {_k, v} ->
-        v.key != nil
-      end)
-
-    exportable =
-      Enum.map(active, fn {k, v} ->
-        member = Member.export(k)
-
-        {v.key,
-         %{
-           ip: member.ip,
-           port: member.port,
-           public: member.public
-         }}
-      end)
-
-    transformed = Enum.into(exportable, %{})
-    {:reply, transformed, state}
   end
 
   def handle_cast({:switch, id}, state) do

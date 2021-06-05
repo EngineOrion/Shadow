@@ -71,14 +71,12 @@ defmodule Shadow.Routing.Member do
   This function is meant to be called in the receive function of the
   GenServer, which needs to return the new state. Therefor "state" is
   handled as a passthrough parameter.
+  TODO: Remove debugging printout
   """
   def call(message, state) do
-    #target = Routing.target(message)
-    #:ok = Routing.send(target, message)
-
-    IO.puts " - - - - - - - New message received! - - - - - - -"
     IO.inspect message
-    IO.puts " - - - - - - - - - - - - - - - - - - - - - - - - -"
+    target = Routing.target(message)
+    :ok = Routing.send(target, message)
     state
   end
 
