@@ -102,4 +102,14 @@ defmodule Shadow.Routing.Message do
   def process(3, _message) do
     %__MODULE__{type: 3}
   end
+
+  def serialize(message) do
+    %{
+      type: message.type,
+      source: message.source,
+      target: message.target,
+      timestamp: message.timestamp,
+      body: message.body
+    } |> Jason.encode!
+  end
 end
