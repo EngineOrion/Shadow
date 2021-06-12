@@ -102,7 +102,7 @@ defmodule Shadow.Routing do
     if target == :__SERVER__ do
       Local.Portal.send(message)
     else
-      Member.send(target.id, message)
+      Member.message(target.id, message)
     end
   end
 

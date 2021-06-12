@@ -143,6 +143,20 @@ defmodule Shadow.Routing.Member do
     {:noreply, state}
   end
 
+  def message(id, message) do
+    GenServer.cast(name(id), {:message, message})
+  end
+
+  @doc """
+  Temporary debug send function that serializes the message internaly.
+  """
+  def handle_cast({:message, message}, state) do
+    :gen_tcp.send(state.socket, Message.serialize(message) <> "\n")
+    {:noreply, state}
+  end
+
+
+  
   @doc """
   Returns the entire state, which should be used in the routing table
   export function.
