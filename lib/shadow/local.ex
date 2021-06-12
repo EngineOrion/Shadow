@@ -50,7 +50,7 @@ defmodule Shadow.Local do
   from a foreign node and false is returned.
   """
   def is_local?(key) do
-    {local, 0} = System.cmd("hunter", ["get", "key", Integer.to_string(key)])
+    {local, _a} = System.cmd("hunter", ["get", "key", Integer.to_string(key)])
     if String.length(local) > 3 do
       true
     else

@@ -134,7 +134,7 @@ defmodule Shadow.Routing do
   def handle_call({:out, {key, ip, port, public}}, _from, state) do
     id = Helpers.id()
     member = %Member{id: id, key: key, ip: ip, port: port, public: public}
-    routing = %__MODULE__{id: id, active: false, timestamp: Helpers.unix_now()}
+    routing = %__MODULE__{id: id, key: key, active: false, timestamp: Helpers.unix_now()}
 
     with {:ok, pid} <- Supervisor.start_out(member) do
       {lkey, lip, lport, lpublic} = Local.activation()
@@ -187,8 +187,13 @@ defmodule Shadow.Routing do
       if Enum.count(state) == 0 do
         {:reply, :__SERVER__, state}
       else
-        distanced = Enum.map(state, fn {_k, v} -> Key.distance(message.target, v.key) end)
+	IO.inspect state
 
+	distanced = Enum.map(state, fn {_k, v} ->
+	  IO.inspect v
+	  Key.distance(message.target, v.key)
+	end)
+	
         min = Enum.min(distanced)
         member = Enum.find(state, fn {_k, v} -> min == Key.distance(message.target, v.key) end)
         {:reply, elem(member, 1), state}

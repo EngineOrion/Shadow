@@ -23,7 +23,7 @@ defmodule Shadow.Local.Portal do
   end
 
   def handle_cast({:send, message}, state) do
-    :gen_tcp.send(state, message <> "\n")
+    :gen_tcp.send(state, Message.serialize(message) <> "\n")
     {:noreply, state}
   end
 

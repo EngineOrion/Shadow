@@ -23,4 +23,8 @@ defmodule Shadow do
     targetMember = Routing.target(msg)
     Routing.send(targetMember, encoded)
   end
+  
+  def import() do
+    Shadow.Local.import("member.json")
+  end
 end
